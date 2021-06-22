@@ -22,7 +22,7 @@
     <meta name="mobile-web-app-capable" content="yes">
 	<meta name="theme-color" content="#d89000">
 	<script type="text/javascript">
-	    /** autoload*/
+	    /** autoload */
 		<%
 				if (request.getParameter("drawxml")!= null) {
 					Base64.Encoder enc = Base64.getEncoder();
@@ -32,12 +32,14 @@
                          .replaceAll("\\%28", "(")
                          .replaceAll("\\%29", ")")
                          .replaceAll("\\%7E", "~").getBytes());
-					out.print("window.drawxmlbase64=\'"+new String(encbytes)+"'");
+					out.print("window.drawxmlbase64=\'"+new String(encbytes)+"';\n");
 				}
 				if (request.getParameter("drawxmlbase64")!= null) {
-					out.print("window.drawxmlbase64=\'"+request.getParameter("drawxmlbase64")+"'");
+					out.print("window.drawxmlbase64=\'"+request.getParameter("drawxmlbase64")+"';\n");
 				}
-		
+				if (request.getParameter("drawxmlname")!= null) {
+					out.print("window.drawxmlname=\'"+request.getParameter("drawxmlname")+"';\n");
+				}
 		%>
 	</script>
 	<script type="text/javascript">

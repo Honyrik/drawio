@@ -3618,11 +3618,10 @@ App.prototype.showSplash = function(force)
 	});
 	if (urlParams['aload'] == '1' && window.drawxmlbase64) {
 		this.setMode(App.MODE_DEVICE, true);
-		var editorUi = this;
+		var xmlname = window.drawxmlname || '';
 		var xml = decodeURIComponent(window.atob(window.drawxmlbase64));
-		var file = new LocalFile(this, xml, '');
+		var file = new LocalFile(this, xml, xmlname);
 		this.fileLoaded(file);
-		editorUi.setMode(App.MODE_DEVICE);
 	} else if (this.editor.isChromelessView())
 	{
 		this.handleError({message: mxResources.get('noFileSelected')},
