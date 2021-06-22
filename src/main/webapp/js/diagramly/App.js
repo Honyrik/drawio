@@ -3616,8 +3616,14 @@ App.prototype.showSplash = function(force)
 				}
 			}), true);
 	});
-	
-	if (this.editor.isChromelessView())
+	if (urlParams['aload'] == '1' && window.drawxmlbase64) {
+		this.setMode(App.MODE_DEVICE, true);
+		var editorUi = this;
+		var xml = decodeURIComponent(window.atob(window.drawxmlbase64));
+		var file = new LocalFile(this, xml, '');
+		this.fileLoaded(file);
+		editorUi.setMode(App.MODE_DEVICE);
+	} else if (this.editor.isChromelessView())
 	{
 		this.handleError({message: mxResources.get('noFileSelected')},
 			mxResources.get('errorLoadingFile'), mxUtils.bind(this, function()
