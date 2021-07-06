@@ -29,8 +29,25 @@
 					out.print("window.urlParamsPost=JSON.parse(\'"+new Gson().toJson(request.getParameterMap())+"\');\n");
 				}
 		%>
+		function addPostParamsInUrlParams() {
+			if (window.urlParamsPost) {
+				var keys = Object.keys(window.urlParamsPost);
+				for (var i = 0; i < keys.length; i++)
+				{
+					var value = window.urlParamsPost[keys[i]]
+					
+					if (value && value.length === 1)
+					{
+						urlParams[keys[i]] = value[0];
+					} else if (value && value.length > 1)
+					{
+						urlParams[keys[i]] = value;
+					}
+				}
+			}
+		}
 	</script>
-	<script type="text/javascript">
+	<script type="text/javascript">	
 		/**
 		 * URL Parameters and protocol description are here:
 		 *
@@ -64,21 +81,7 @@
 					result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
 				}
 			}
-			if (window.urlParamsPost) {
-				var keys = Object.keys(window.urlParamsPost);
-				for (var i = 0; i < keys.length; i++)
-				{
-					var value = window.urlParamsPost[keys[i]]
-					
-					if (value && value.length === 1)
-					{
-						result[keys[i]] = value[0];
-					} else if (value && value.length > 1)
-					{
-						result[keys[i]] = value;
-					}
-				}
-			}
+			
 			return result;
 		})();
 		
@@ -88,7 +91,6 @@
 			try
 			{
 				urlParams = JSON.parse(decodeURIComponent(window.location.hash.substring(2)));
-				
 				if (urlParams.hash != null)
 				{
 					window.location.hash = urlParams.hash;
@@ -99,6 +101,9 @@
 				// ignore
 			}
 		}
+
+		// add params
+		addPostParamsInUrlParams();
 		
 		// Global variable for desktop
 		var mxIsElectron = window && window.process && window.process.type;
