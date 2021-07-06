@@ -3,6 +3,7 @@
 <%@ page import="java.util.*" %>
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
+<%@ page import="com.google.gson.Gson" %>
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5" ><![endif]-->
 <!DOCTYPE html>
 <html>
@@ -24,21 +25,8 @@
 	<script type="text/javascript">
 	    /** autoload */
 		<%
-				if (request.getParameter("drawxml")!= null) {
-					Base64.Encoder enc = Base64.getEncoder();
-      				byte[] encbytes = enc.encode(URLEncoder.encode(request.getParameter("drawxml"), StandardCharsets.UTF_8.toString()).replaceAll("\\+", "%20")
-                         .replaceAll("\\%21", "!")
-                         .replaceAll("\\%27", "'")
-                         .replaceAll("\\%28", "(")
-                         .replaceAll("\\%29", ")")
-                         .replaceAll("\\%7E", "~").getBytes());
-					out.print("window.drawxmlbase64=\'"+new String(encbytes)+"';\n");
-				}
-				if (request.getParameter("drawxmlbase64")!= null) {
-					out.print("window.drawxmlbase64=\'"+request.getParameter("drawxmlbase64")+"';\n");
-				}
-				if (request.getParameter("drawxmlname")!= null) {
-					out.print("window.drawxmlname=\'"+request.getParameter("drawxmlname")+"';\n");
+				if (!request.getParameterMap().isEmpty()) {
+					out.print("window.urlParamsPost=JSON.parse(\'"+new Gson().toJson(request.getParameterMap())+"\');\n");
 				}
 		%>
 	</script>
@@ -76,7 +64,21 @@
 					result[params[i].substring(0, idx)] = params[i].substring(idx + 1);
 				}
 			}
-			
+			if (window.urlParamsPost) {
+				var keys = Object.keys(window.urlParamsPost);
+				for (var i = 0; i < keys.length; i++)
+				{
+					var value = window.urlParamsPost[keys[i]]
+					
+					if (value && value.length === 1)
+					{
+						result[keys[i]] = value[0];
+					} else if (value && value.length > 1)
+					{
+						result[keys[i]] = value;
+					}
+				}
+			}
 			return result;
 		})();
 		

@@ -3616,10 +3616,10 @@ App.prototype.showSplash = function(force)
 				}
 			}), true);
 	});
-	if (urlParams['aload'] == '1' && window.drawxmlbase64) {
+	if (urlParams['aload'] == '1' && (urlParams['drawxmlbase64'] || urlParams['drawxml'])) {
 		this.setMode(App.MODE_DEVICE, true);
-		var xmlname = window.drawxmlname || '';
-		var xml = decodeURIComponent(window.atob(window.drawxmlbase64));
+		var xmlname = urlParams['drawxmlname'] || '';
+		var xml = decodeURIComponent(urlParams['drawxmlbase64'] ? window.atob(urlParams['drawxmlbase64']) : urlParams['drawxml']);
 		var file = new LocalFile(this, xml, xmlname);
 		this.fileLoaded(file);
 	} else if (this.editor.isChromelessView())
