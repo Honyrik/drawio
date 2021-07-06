@@ -31,5 +31,5 @@ window.OPEN_FORM = window.OPEN_FORM || 'open.html';
 // each properties file since only one file is loaded.
 window.mxBasePath = window.mxBasePath || 'mxgraph';
 window.mxImageBasePath = window.mxImageBasePath || 'mxgraph/images';
-window.mxLanguage = window.mxLanguage || urlParams['lang'];
-window.mxLanguages = window.mxLanguages || ['de', 'se'];
+window.mxLanguage = window.mxLanguage || urlParams['lang'] || 'ru';
+window.mxLanguages = window.mxLanguages || ['ru', 'en', 'de', 'se'];
