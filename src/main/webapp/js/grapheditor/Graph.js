@@ -7292,6 +7292,17 @@ if (typeof mxVertexHandler != 'undefined')
 		{
 			mapping = (mapping != null) ? mapping : new Object();
 			
+			var isChangeParent = false;
+			if (target) {
+				for (var i = 0; i < cells.length; i++) {
+					if (cells[i].parent && cells[i].parent.id !== target.id) {
+						isChangeParent = true;
+					}
+				}
+			}
+			if (isChangeParent && !mxUtils.confirm(mxResources.get('changesParent'))) {
+				return;
+			}
 			// Replaces source tables with rows
 			if (this.isTable(target))
 			{

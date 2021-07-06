@@ -90,6 +90,7 @@ changeOrientation=Изменить ориентацию
 changeUser=Сменить пользователя
 changeStorage=Изменить место хранения
 changesNotSaved=Изменения не сохранены
+changesParent=Сменить родителя?
 classDiagram=Class Diagram
 userJoined={1} присоединился
 userLeft={1} вышел
