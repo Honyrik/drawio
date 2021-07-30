@@ -32,6 +32,7 @@ RUN mkdir -p $CATALINA_HOME/webapps/draw && \
         -P -S -L \
         -i '/Server/Service/Engine/Host/Valve' -t 'elem' -n 'Context' \
         -i '/Server/Service/Engine/Host/Context' -t 'attr' -n 'path' -v '/' \
+        -i '/Server/Service/Connector' -t 'attr' -n 'maxHttpHeaderSize' -v '10000000' \
         -i '/Server/Service/Engine/Host/Context[@path="/"]' -t 'attr' -n 'docBase' -v 'draw' \
         -s '/Server/Service/Engine/Host/Context[@path="/"]' -t 'elem' -n 'WatchedResource' -v 'WEB-INF/web.xml' \
         -i '/Server/Service/Engine/Host/Valve' -t 'elem' -n 'Context' \

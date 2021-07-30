@@ -3619,7 +3619,7 @@ App.prototype.showSplash = function(force)
 	if (urlParams['aload'] == '1' && (urlParams['drawxmlbase64'] || urlParams['drawxml'])) {
 		this.setMode(App.MODE_DEVICE, true);
 		var xmlname = urlParams['drawxmlname'] || '';
-		var xml = decodeURIComponent(urlParams['drawxmlbase64'] ? window.atob(urlParams['drawxmlbase64']) : urlParams['drawxml']);
+		var xml = decodeURIComponent(urlParams['drawxmlbase64'] ? window.atob(decodeURIComponent(urlParams['drawxmlbase64'])) : urlParams['drawxml']);
 		var file = new LocalFile(this, xml, xmlname);
 		this.fileLoaded(file);
 	} else if (this.editor.isChromelessView())
