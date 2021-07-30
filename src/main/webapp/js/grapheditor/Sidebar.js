@@ -92,8 +92,10 @@ function Sidebar(editorUi, container)
 Sidebar.prototype.init = function()
 {
 	var dir = STENCIL_PATH;
-	
-	this.addSearchPalette(true);
+
+	if (!urlParams['disable_more_libs'] || this.onlyCustomLibs) {
+		this.addSearchPalette(true);
+	}
 	this.addGeneralPalette(true);
 	this.addMiscPalette(false);
 	this.addAdvancedPalette(false);

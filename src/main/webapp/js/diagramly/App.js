@@ -1160,7 +1160,7 @@ App.main = function(callback, createUi)
 				try
 				{
 					EditorUi.debug('Using global configuration', window.DRAWIO_CONFIG);
-					Editor.configure(window.DRAWIO_CONFIG);
+					Editor.configure(typeof window.DRAWIO_CONFIG === "string" ? JSON.parse(window.DRAWIO_CONFIG) : window.DRAWIO_CONFIG);
 					mxSettings.load();
 				}
 				catch (e)

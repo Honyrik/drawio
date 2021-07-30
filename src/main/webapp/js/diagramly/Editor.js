@@ -1838,6 +1838,11 @@
 			{
 				Sidebar.prototype.customEntries = config.libraries;
 			}
+
+			if (config.onlyCustomLibs != null)
+			{
+				Sidebar.prototype.onlyCustomLibs = config.onlyCustomLibs;
+			}
 			
 			// Defines the enabled built-in libraries.
 			if (config.enabledLibraries != null)

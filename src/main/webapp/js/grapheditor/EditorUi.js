@@ -1442,6 +1442,17 @@ EditorUi.prototype.getCellsForShapePicker = function(cell)
 	{
 		return this.editor.graph.createVertex(null, null, value || '', 0, 0, w || 120, h || 60, style, false);
 	});
+
+	if (Sidebar.prototype.onlyCustomLibs && Sidebar.prototype.customEntries) {
+		var result = [];
+		var taglist = Object.values(this.sidebar.taglist);
+		for (var i = 0; i<taglist.length; i+=1) {
+			for (var l = 0; l<taglist[i].entries.length; l+=1) {
+				result.push(taglist[i].entries[l]());
+			}
+		}
+		return result;
+	}
 	
 	return [(cell != null) ? this.editor.graph.cloneCell(cell) :
 			createVertex('text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;', 40, 20, 'Text'),

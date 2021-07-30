@@ -3602,7 +3602,7 @@
 	 */
 	EditorUi.prototype.getResource = function(obj)
 	{
-		return (obj != null) ? (obj[mxLanguage] || obj.main) : null;
+		return (obj != null) ? (obj[mxLanguage] || obj.main || obj) : null;
 	};
 	
 	/**
@@ -10962,7 +10962,7 @@
 	{
 		this.diagramContainer.style.visibility = (enabled) ? '' : 'hidden';
 		this.formatContainer.style.visibility = (enabled) ? '' : 'hidden';
-		this.sidebarFooterContainer.style.display = (enabled) ? '' : 'none';
+		this.sidebarFooterContainer.style.display = (enabled) ? (urlParams['disable_more_libs'] || Sidebar.prototype.onlyCustomLibs ? 'hidden' : '') : 'none';
 		this.sidebarContainer.style.display = (enabled) ? '' : 'none';
 		this.hsplit.style.display = (enabled) ? '' : 'none';
 		this.editor.graph.setEnabled(enabled);

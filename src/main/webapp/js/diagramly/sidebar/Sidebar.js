@@ -92,6 +92,8 @@
 	 * Description of custom libraries, see https://www.diagrams.net/doc/faq/configure-diagram-editor
 	 */
 	Sidebar.prototype.customEntries = null;
+
+	Sidebar.prototype.onlyCustomLibs = false;
 	
 	/**
 	 * Array of strings for the built-in libraries to be enabled in the more shapes dialog. Null means all,
@@ -850,7 +852,9 @@
 			this.createdSearchIndex = [];
 		}
 
-		this.addSearchPalette(true);
+		if (!urlParams['disable_more_libs'] && !this.onlyCustomLibs) {
+			this.addSearchPalette(true);
+		}
 		
 		// Adds custom sections first
 		if (this.customEntries != null)
@@ -912,10 +916,10 @@
 								}
 							});
 							
-							if (lib.data == null && lib.url != null && (!lib.preload && preloadCount >= this.maxPreloadCount))
+							if (lib.data == null && lib.mxlibrary == null && lib.url != null && (!lib.preload && preloadCount >= this.maxPreloadCount))
 							{
 								this.addPalette(entry.id + '.' + k, this.editorUi.getResource(lib.title),
-									false, mxUtils.bind(this, function(content, title)
+								entry.expanded ? true : false, mxUtils.bind(this, function(content, title)
 								{
 									var dataLoaded = mxUtils.bind(this, function(images)
 									{
@@ -966,14 +970,40 @@
 							else
 							{							
 								this.addPalette(entry.id + '.' + k, this.editorUi.getResource(lib.title),
-									false, mxUtils.bind(this, function(c, t)
+								entry.expanded ? true : false, mxUtils.bind(this, function(c, t)
 								{
 									content = c;
 									title = t;
 									barrier();
 								}));
-								
-								if (lib.data != null)
+
+								if (lib.mxlibrary != null)
+								{
+									this.setCurrentSearchEntryLibrary(entry.id, entry.id + '.' + k);
+									try
+										{
+											var doc = mxUtils.parseXml(lib.mxlibrary);
+											
+											if (doc.documentElement.nodeName == 'mxlibrary')
+											{
+												data = JSON.parse(mxUtils.getTextContent(doc.documentElement));
+												lib.data = data;
+												this.addEntries(data);
+												this.setCurrentSearchEntryLibrary();
+												barrier();
+											}
+											else
+											{
+												error = mxResources.get('notALibraryFile');
+												barrier();
+											}
+										}
+										catch (e)
+										{
+											error = mxResources.get('error') + ': ' + e.message;
+											barrier();
+										}
+								} else if (lib.data != null)
 								{
 									this.setCurrentSearchEntryLibrary(entry.id, entry.id + '.' + k);
 									this.addEntries(lib.data);
@@ -1000,6 +1030,7 @@
 											if (doc.documentElement.nodeName == 'mxlibrary')
 											{
 												data = JSON.parse(mxUtils.getTextContent(doc.documentElement));
+												lib.data = data;
 												this.addEntries(data);
 												barrier();
 											}
@@ -1030,6 +1061,11 @@
 					}
 				}
 			}
+		}
+
+		if (window.onlyCustomLibs || this.onlyCustomLibs) {
+			this.showEntries();
+			return;
 		}
 		
 		this.addGeneralPalette(this.customEntries == null);
