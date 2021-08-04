@@ -4,6 +4,8 @@
 <%@ page import="java.net.URLEncoder" %>
 <%@ page import="java.nio.charset.StandardCharsets" %>
 <%@ page import="com.google.gson.Gson" %>
+<%@ page import="javax.servlet.http.HttpServletRequest" %>
+<%@ page import="javax.servlet.http.HttpSession" %>
 <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=5" ><![endif]-->
 <!DOCTYPE html>
 <html>
@@ -27,6 +29,18 @@
 		<%
 				if (!request.getParameterMap().isEmpty()) {
 					out.print("window.urlParamsPost=JSON.parse(\'"+new Gson().toJson(request.getParameterMap())+"\');\n");
+				}
+				HttpServletRequest req = (HttpServletRequest) request;
+				HttpSession sess = req.getSession(false);
+				if (sess != null) {
+					Object paramObj = sess.getAttribute("keycloak.session.old_param");
+					if (paramObj != null) {
+						Map<String, String[]> param = (Map<String, String[]>) paramObj;
+						if (!param.isEmpty()) {
+							out.print("window.urlParamsPost=Object.assign(window.urlParamsPost || {}, JSON.parse(\'"+new Gson().toJson(param)+"\'));\n");
+						}
+						sess.removeAttribute("keycloak.session.old_param");
+					}
 				}
 		%>
 		function addPostParamsInUrlParams() {

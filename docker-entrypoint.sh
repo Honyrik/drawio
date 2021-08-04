@@ -10,6 +10,7 @@ STATE=${STATE:-'Paris'}
 COUNTRY_CODE=${COUNTRY:-'FR'}
 KEYSTORE_PASS=${KEYSTORE_PASS:-'V3ry1nS3cur3P4ssw0rd'}
 KEY_PASS=${KEY_PASS:-$KEYSTORE_PASS}
+KEYCLOAK_FILE=${KEYCLOAK_FILE:-'/keycloak.json'}
 
 echo "Init PreConfig.js"
 #Add CSP to prevent calls to draw.io
@@ -161,6 +162,26 @@ if [ -f $CATALINA_HOME/.keystore ] && [ -z $VAR ]; then
         -i "/Server/Service/${UUID}" -t 'attr' -n 'KeystorePass' -v "${KEY_PASS}" \
         -r "/Server/Service/${UUID}" -v 'Connector' \
     conf/server.xml
+fi
+
+if [ -f $KEYCLOAK_FILE ]; then
+    echo "Append keycloak filter to web.xml"
+
+    xmlstarlet ed \
+        -P -S -L \
+        -N x="http://xmlns.jcp.org/xml/ns/javaee" \
+        -s 'x:web-app' -t 'elem' -n "filter" \
+        -s '$prev' -t 'elem' -n 'filter-name' -v 'Keycloak Filter' \
+        -i '$prev' -t 'elem' -n 'filter-class' -v 'org.keycloak.adapters.servlet.KeycloakOIDCSaveParamFilter' \
+        -i '$prev' -t 'elem' -n 'init-param' \
+        -s '$prev' -t 'elem' -n 'param-name' -v 'keycloak.config.file' \
+        -i '$prev' -t 'elem' -n 'param-value' -v $KEYCLOAK_FILE \
+        -s 'x:web-app' -t 'elem' -n "filter-mapping" \
+        -s '$prev' -t 'elem' -n 'filter-name' -v 'Keycloak Filter' \
+        -i '$prev' -t 'elem' -n 'url-pattern' -v '/*' \
+    $CATALINA_HOME/webapps/draw/WEB-INF/web.xml
+    xmlstarlet fo -R $CATALINA_HOME/webapps/draw/WEB-INF/web.xml 1>/tmp/web.xml.new
+    mv /tmp/web.xml.new $CATALINA_HOME/webapps/draw/WEB-INF/web.xml
 fi
 
 
