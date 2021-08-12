@@ -17,10 +17,12 @@ ENV PATH=$PATH:/opt/apache-tomcat-9.0.43/bin
 
 USER root
 
-COPY ./etc/utils/xmlstarlet-1.6.1-1.el7.x86_64.rpm /tmp/.
+COPY ./etc/utils /tmp
 
-RUN microdnf --setopt=tsflags=nodocs install -y libxslt gzip && \
-    rpm -if /tmp/xmlstarlet-1.6.1-1.el7.x86_64.rpm
+RUN rpm -if /tmp/gzip-1.9-12.el8.x86_64.rpm && \
+    rpm -if /tmp/libxslt-1.1.32-6.el8.x86_64.rpm && \
+    rpm -if /tmp/xmlstarlet-1.6.1-11.el8.x86_64.rpm && \
+    rm -rf /tmp/*.rpm
 
 COPY ./tomcat-9.0.43.tar.gz /opt/.
 COPY --from=build /tmp/drawio/build/draw.war /tmp
