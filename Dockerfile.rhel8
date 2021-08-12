@@ -1,0 +1,59 @@
+FROM openjdk:8-alpine AS build
+
+RUN apk update --no-cache && \
+    apk add --no-cache \
+        apache-ant
+
+COPY . /tmp/drawio
+
+RUN cd /tmp && \
+    cd /tmp/drawio/etc/build/ && \
+    ant war
+
+FROM registry.access.redhat.com/ubi8/openjdk-8
+
+ENV CATALINA_HOME=/opt/apache-tomcat-9.0.43
+ENV PATH=$PATH:/opt/apache-tomcat-9.0.43/bin
+
+USER root
+
+COPY ./etc/utils/xmlstarlet-1.6.1-1.el7.x86_64.rpm /tmp/.
+
+RUN microdnf --setopt=tsflags=nodocs install -y libxslt gzip && \
+    rpm -if /tmp/xmlstarlet-1.6.1-1.el7.x86_64.rpm
+
+COPY ./tomcat-9.0.43.tar.gz /opt/.
+COPY --from=build /tmp/drawio/build/draw.war /tmp
+
+RUN cd /opt && tar -xzvf tomcat-9.0.43.tar.gz && \
+    rm -rf tomcat-9.0.43.tar.gz  && \
+    mkdir -p $CATALINA_HOME/webapps/draw && \
+    unzip /tmp/draw.war -d $CATALINA_HOME/webapps/draw && \
+    rm -rf /tmp/draw.war && \
+    cd $CATALINA_HOME && \
+    xmlstarlet ed \
+        -P -S -L \
+        -i '/Server/Service/Engine/Host/Valve' -t 'elem' -n 'Context' \
+        -i '/Server/Service/Engine/Host/Context' -t 'attr' -n 'path' -v '/' \
+        -i '/Server/Service/Connector' -t 'attr' -n 'maxHttpHeaderSize' -v '10000000' \
+        -i '/Server/Service/Engine/Host/Context[@path="/"]' -t 'attr' -n 'docBase' -v 'draw' \
+        -s '/Server/Service/Engine/Host/Context[@path="/"]' -t 'elem' -n 'WatchedResource' -v 'WEB-INF/web.xml' \
+        -i '/Server/Service/Engine/Host/Valve' -t 'elem' -n 'Context' \
+        -i '/Server/Service/Engine/Host/Context[not(@path="/")]' -t 'attr' -n 'path' -v '/ROOT' \
+        -s '/Server/Service/Engine/Host/Context[@path="/ROOT"]' -t 'attr' -n 'docBase' -v 'ROOT' \
+        -s '/Server/Service/Engine/Host/Context[@path="/ROOT"]' -t 'elem' -n 'WatchedResource' -v 'WEB-INF/web.xml' \
+        conf/server.xml && \
+        chown -R 183:0 $CATALINA_HOME
+
+COPY docker-entrypoint.sh /
+RUN chmod +x /docker-entrypoint.sh
+
+USER 183
+
+WORKDIR $CATALINA_HOME
+
+EXPOSE 8080 8443
+
+ENTRYPOINT ["/docker-entrypoint.sh"]
+
+CMD ["catalina.sh", "run"]
